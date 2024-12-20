@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input {
+            display: block;
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #submittedData {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #employeeList {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #employees {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #employees li {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <form id="registrationForm">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="button" id="submitButton">Submit</button>
+        </form>
+        <div id="submittedData">
+            <h2>Submitted Data</h2>
+            <p id="nameData"></p>
+            <p id="emailData"></p>
+            <p id="passwordData"></p>
+        </div>
+        <div id="employeeList">
+            <h2>Employee List</h2>
+            <ul id="employees"></ul>
+        </div>
+    </div>
+    <script>
+        document.getElementById('submitButton').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const formData = {
+                name: name,
+                email: email,
+                password: password
+            };
+
+            // Display the submitted data
+            document.getElementById('nameData').textContent = `Name: ${name}`;
+            document.getElementById('emailData').textContent = `Email: ${email}`;
+            document.getElementById('passwordData').textContent = `Password: ${password}`;
+
+            // Submit the form data to the API
+            fetch('https://jsonplaceholder.typicode.com/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Form submitted successfully:', data);
+                alert('Registration successful!');
+
+                // Fetch the employee list after form submission
+                fetch('https://jsonplaceholder.typicode.com/users')
+                    .then(response => response.json())
+                    .then(data => {
+                        const employeeList = document.getElementById('employees');
+                        employeeList.innerHTML = ''; // Clear existing list
+                        data.forEach(employee => {
+                            const li = document.createElement('li');
+                            li.textContent = employee.name;
+                            employeeList.appendChild(li);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching employees:', error);
+                    });
+            })
+            .catch(error => {
+                console.error('Error submitting the form:', error);
+                alert('Registration failed.');
+            });
+        });
+    </script>
+</body>
+</html>
